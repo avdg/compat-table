@@ -68,6 +68,7 @@ process.nextTick(function () {
   var esprima     = require('esprima');
   var espree      = require('espree');
   var jshint      = require('jshint');
+  var uglify      = require('uglify-js');
   [
     {
       name: 'es5-shim',
@@ -257,6 +258,25 @@ process.nextTick(function () {
         return output;
       },
     },
+    {
+      name: 'UglifyJS2',
+      url: 'http://github.com/mishoo/UglifyJS2',
+      target_file: 'es6/compilers/uglifyjs.html',
+      polyfills: [],
+      compiler: function() {
+        var fpath = os.tmpDir() + path.sep + 'temp.js';
+        var file = fs.writeFileSync(fpath, code);
+        try {
+          var output = ""+child_process.execSync('node_modules/uglify-js/bin/uglifyjs ' +
+            fpath
+          );
+        } catch(e) {
+          throw new Error('\n' + e.stdout.toString().split(fpath).join(''));
+        }
+        console.log(output);
+        return output;
+      }
+    }
   ].forEach(function(e){
     Object.assign(es6, e);
     es6.browsers = {};
